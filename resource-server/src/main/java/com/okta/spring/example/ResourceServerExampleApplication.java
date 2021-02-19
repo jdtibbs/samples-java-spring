@@ -48,7 +48,7 @@ public class ResourceServerExampleApplication {
     }
 
     @RestController
-    @CrossOrigin(origins = "http://localhost:8080")
+    @CrossOrigin(origins = "http://localhost:3000")
     public class MessageOfTheDayController {
 
         @GetMapping("/api/userProfile")
