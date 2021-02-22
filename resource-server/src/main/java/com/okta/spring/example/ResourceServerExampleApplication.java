@@ -66,11 +66,18 @@ public class ResourceServerExampleApplication {
         @GetMapping("/api/admin")
         @ResponseBody
         @PreAuthorize("hasAuthority('Admin')")
-//      @PreAuthorize("hasRole('ADMIN')") // Spring security roles, add group ROLE_ADMIN
+//      @PreAuthorize("hasRole('ADMIN')") // to use Spring hasRoles, add Okta group with name ROLE_ADMIN
         public String admin() {
             return "Hello, Admin!";
         }
 
+        @GetMapping("/api/multiGroup")
+        @ResponseBody
+        @PreAuthorize("hasAnyAuthority('Admin','Team_UW')")
+        public String multiGroup() {
+            return "Hello, Admin & Underwriting!";
+        }
+        
         @GetMapping("/api/everyone")
         @ResponseBody
         @PreAuthorize("hasAuthority('SCOPE_email')")
