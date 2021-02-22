@@ -10,16 +10,14 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.oauth2.core.AbstractOAuth2Token;
 import org.springframework.security.oauth2.server.resource.authentication.AbstractOAuth2TokenAuthenticationToken;
-import org.springframework.security.oauth2.server.resource.authentication.BearerTokenAuthentication;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 @SpringBootApplication
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
@@ -35,9 +33,10 @@ public class ResourceServerExampleApplication {
         @Override
         protected void configure(HttpSecurity http) throws Exception {
             http.authorizeRequests()
-                .anyRequest().authenticated()
-            .and()
-                .oauth2ResourceServer().jwt(); //or .opaqueToken();
+                    .anyRequest()
+                    .authenticated()
+                    .and()
+                    .oauth2ResourceServer().jwt(); //or .opaqueToken();
 
             // process CORS annotations
             http.cors();
@@ -52,40 +51,39 @@ public class ResourceServerExampleApplication {
     public class MessageOfTheDayController {
 
         @GetMapping("/api/userProfile")
-        @PreAuthorize("hasAuthority('SCOPE_profile')")
+        @PreAuthorize("hasAuthority('Everyone')")
         public <A extends AbstractOAuth2TokenAuthenticationToken<AbstractOAuth2Token>> Map<String, Object> getUserDetails(A authentication) {
             return authentication.getTokenAttributes();
         }
 
         //For JWT only
         @GetMapping("/api/userProfileJWT")
-        @PreAuthorize("hasAuthority('SCOPE_profile')")
+        @PreAuthorize("hasAuthority('SCOPE_openid')")
         public Map<String, Object> getUserDetails(JwtAuthenticationToken authentication) {
             return authentication.getTokenAttributes();
         }
 
-        //For Opaque Token only
-        @GetMapping("/api/userProfileOpaque")
-        @PreAuthorize("hasAuthority('SCOPE_profile')")
-        public Map<String, Object> getUserDetails(BearerTokenAuthentication authentication) {
-            return authentication.getTokenAttributes();
+        @GetMapping("/api/admin")
+        @ResponseBody
+        @PreAuthorize("hasAuthority('Admin')")
+//      @PreAuthorize("hasRole('ADMIN')") // Spring security roles, add group ROLE_ADMIN
+        public String admin() {
+            return "Hello, Admin!";
         }
 
-        @GetMapping("/api/messages")
+        @GetMapping("/api/everyone")
+        @ResponseBody
         @PreAuthorize("hasAuthority('SCOPE_email')")
-        public Map<String, Object> messages() {
-
-            Map<String, Object> result = new HashMap<>();
-            result.put("messages", Arrays.asList(
-                    new Message("I am a robot."),
-                    new Message("Hello, world!")
-            ));
-
-            return result;
+        // @PreAuthorize("hasAuthority('SCOPE_openid')")
+        // @PreAuthorize("hasAuthority('SCOPE_profile')")
+        public String everyone() {
+            return "Hello, Everyone!";
         }
+
     }
 
     class Message {
+
         public Date date = new Date();
         public String text;
 
