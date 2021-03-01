@@ -33,10 +33,11 @@ public class ResourceServerExampleApplication {
         @Override
         protected void configure(HttpSecurity http) throws Exception {
             http.authorizeRequests()
-                    .anyRequest()
-                    .authenticated()
-                    .and()
-                    .oauth2ResourceServer().jwt(); //or .opaqueToken();
+                .anyRequest()
+                .authenticated()
+                .and()
+                .oauth2ResourceServer().jwt();
+//                .oauth2ResourceServer().opaqueToken();
 
             // process CORS annotations
             http.cors();
@@ -51,39 +52,41 @@ public class ResourceServerExampleApplication {
     public class MessageOfTheDayController {
 
         @GetMapping("/api/userProfile")
-        @PreAuthorize("hasAuthority('Everyone')")
-        public <A extends AbstractOAuth2TokenAuthenticationToken<AbstractOAuth2Token>> Map<String, Object> getUserDetails(A authentication) {
-            return authentication.getTokenAttributes();
-        }
-
-        //For JWT only
-        @GetMapping("/api/userProfileJWT")
+//        @PreAuthorize("hasAuthority('Everyone')")
         @PreAuthorize("hasAuthority('SCOPE_openid')")
-        public Map<String, Object> getUserDetails(JwtAuthenticationToken authentication) {
+//        @PreAuthorize("hasRole('APP_PMHorizon_IT')")
+        public <A extends AbstractOAuth2TokenAuthenticationToken<AbstractOAuth2Token>> Map<String, Object> getUserDetails(A authentication) {
+            System.out.println("/api/userProfile");
             return authentication.getTokenAttributes();
         }
-
+               
+                
         @GetMapping("/api/admin")
         @ResponseBody
+//        @PreAuthorize("hasAuthority('SCOPE_openid')")
         @PreAuthorize("hasAuthority('Admin')")
 //      @PreAuthorize("hasRole('ADMIN')") // to use Spring hasRoles, add Okta group with name ROLE_ADMIN
         public String admin() {
+            System.out.println("/api/admin");
             return "Hello, Admin!";
         }
 
         @GetMapping("/api/multiGroup")
         @ResponseBody
+//        @PreAuthorize("hasAuthority('SCOPE_openid')")
         @PreAuthorize("hasAnyAuthority('Admin','Team_UW')")
         public String multiGroup() {
+            System.out.println("/api/multiGroup");
             return "Hello, Admin & Underwriting!";
         }
         
         @GetMapping("/api/everyone")
         @ResponseBody
-        @PreAuthorize("hasAuthority('SCOPE_email')")
-        // @PreAuthorize("hasAuthority('SCOPE_openid')")
+        @PreAuthorize("hasAuthority('SCOPE_openid')")
+        // @PreAuthorize("hasAuthority('SCOPE_email')")        
         // @PreAuthorize("hasAuthority('SCOPE_profile')")
         public String everyone() {
+            System.out.println("/api/everyone");
             return "Hello, Everyone!";
         }
 

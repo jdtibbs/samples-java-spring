@@ -1,5 +1,5 @@
 server:
-    port: 8000
+    port: 7443        
 
 spring:
     jackson:
@@ -8,4 +8,5 @@ spring:
 
 okta:
     oauth2:
-        issuer: https://{fred}.okta.com
+        issuer: https://dev-06608405.okta.com/oauth2/default
+        # issuer: https://phmic.okta.com
